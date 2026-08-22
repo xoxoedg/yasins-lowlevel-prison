@@ -1,0 +1,70 @@
+---
+interface Props {
+	title?: string;
+	class?: string;
+}
+
+const { title = '', class: className = '' } = Astro.props;
+---
+
+<div class:list={['terminal-window', className]}>
+	<div class="terminal-titlebar">
+		<span class="dots" aria-hidden="true">
+			<span class="dot dot-red"></span>
+			<span class="dot dot-yellow"></span>
+			<span class="dot dot-green"></span>
+		</span>
+		{title && <span class="terminal-title">{title}</span>}
+	</div>
+	<div class="terminal-body">
+		<slot />
+	</div>
+</div>
+
+<style>
+	.terminal-window {
+		border: 1px solid var(--color-border);
+		border-radius: 8px;
+		background: var(--color-panel);
+		box-shadow: var(--shadow-terminal);
+		overflow: hidden;
+	}
+	.terminal-titlebar {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.6em 0.9em;
+		border-bottom: 1px solid var(--color-border);
+		background: color-mix(in srgb, var(--color-panel) 92%, white 3%);
+	}
+	.dots {
+		display: flex;
+		gap: 0.4em;
+		flex-shrink: 0;
+	}
+	.dot {
+		width: 0.7em;
+		height: 0.7em;
+		border-radius: 50%;
+		display: inline-block;
+	}
+	.dot-red {
+		background: #ff5f56;
+	}
+	.dot-yellow {
+		background: #ffbd2e;
+	}
+	.dot-green {
+		background: #27c93f;
+	}
+	.terminal-title {
+		color: var(--color-muted);
+		font-size: 0.85em;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.terminal-body {
+		padding: 1.25em 1.5em;
+	}
+</style>

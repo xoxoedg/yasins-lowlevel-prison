@@ -1,0 +1,74 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import Tag from '../components/Tag.astro';
+import TerminalWindow from '../components/TerminalWindow.astro';
+import { SITE_TITLE } from '../consts';
+
+const projects = [
+	{
+		name: 'ptrace-toy',
+		description: 'Small ptrace-based syscall tracer for Linux, built to understand process debugging internals.',
+		tags: ['linux', 'hacking'],
+		href: '#',
+	},
+];
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`projects — ${SITE_TITLE}`} description="Selected low-level projects and write-ups." />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h1>projects</h1>
+			<div class="project-grid">
+				{
+					projects.map((project) => (
+						<TerminalWindow title={project.name}>
+							<p class="description">{project.description}</p>
+							<div class="tags">
+								{project.tags.map((tag) => (
+									<Tag label={tag} />
+								))}
+							</div>
+							<a class="link" href={project.href}>
+								→ view repo
+							</a>
+						</TerminalWindow>
+					))
+				}
+			</div>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.project-grid {
+		display: grid;
+		gap: 1.25em;
+		margin-top: 1.5em;
+	}
+	.description {
+		color: var(--color-text);
+		margin: 0 0 1em 0;
+	}
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4em;
+		margin-bottom: 1em;
+	}
+	.link {
+		color: var(--color-accent);
+		text-decoration: none;
+		font-size: 0.9em;
+	}
+	.link:hover {
+		text-decoration: underline;
+	}
+</style>

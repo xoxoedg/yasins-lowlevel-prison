@@ -1,63 +1,75 @@
 ---
-import AboutHeroImage from '../assets/blog-placeholder-about.jpg';
+import Tag from '../components/Tag.astro';
+import TerminalWindow from '../components/TerminalWindow.astro';
 import Layout from '../layouts/BlogPost.astro';
+
+const stack = ['typescript', 'react', 'java', 'spring-boot', 'kubernetes', 'jenkins'];
+const interests = ['os-internals', 'security', 'assembly', 'hardware'];
 ---
 
 <Layout
-	title="About Me"
-	description="Lorem ipsum dolor sit amet"
-	pubDate={new Date('August 08 2021')}
-	heroImage={AboutHeroImage}
+	title="About"
+	description="Fullstack developer at CHECK24, finishing a CS degree, endlessly curious about how computers actually work."
+	pubDate={new Date('Aug 22 2026')}
 >
-	<p>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-		labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo
-		viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam
-		adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus
-		et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus
-		vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque
-		sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.
-	</p>
+	<TerminalWindow title="yasin@lowlevel:~/about">
+		<p class="line"><span class="prompt">$</span> whoami</p>
+		<p class="output">
+			Fullstack developer at CHECK24, currently finishing my Computer Science bachelor's.
+		</p>
+	</TerminalWindow>
 
+	<h2>work</h2>
 	<p>
-		Morbi tristique senectus et netus. Id semper risus in hendrerit gravida rutrum quisque non
-		tellus. Habitasse platea dictumst quisque sagittis purus sit amet. Tellus molestie nunc non
-		blandit massa. Cursus vitae congue mauris rhoncus. Accumsan tortor posuere ac ut. Fringilla urna
-		porttitor rhoncus dolor. Elit ullamcorper dignissim cras tincidunt lobortis. In cursus turpis
-		massa tincidunt dui ut ornare lectus. Integer feugiat scelerisque varius morbi enim nunc.
-		Bibendum neque egestas congue quisque egestas diam. Cras ornare arcu dui vivamus arcu felis
-		bibendum. Dignissim suspendisse in est ante in nibh mauris. Sed tempus urna et pharetra pharetra
-		massa massa ultricies mi.
+		At CHECK24 I own the application-management flow of the car insurance (KFZ) product end to
+		end — frontend in TypeScript/React, backend in Java/Spring Boot. That includes the Jenkins
+		pipelines that ship it and the Kubernetes setup it runs on.
 	</p>
+	<div class="tags">
+		{stack.map((tag) => <Tag label={tag} />)}
+	</div>
 
+	<h2>off the clock</h2>
 	<p>
-		Mollis nunc sed id semper risus in. Convallis a cras semper auctor neque. Diam sit amet nisl
-		suscipit. Lacus viverra vitae congue eu consequat ac felis donec. Egestas integer eget aliquet
-		nibh praesent tristique magna sit amet. Eget magna fermentum iaculis eu non diam. In vitae
-		turpis massa sed elementum. Tristique et egestas quis ipsum suspendisse ultrices. Eget lorem
-		dolor sed viverra ipsum. Vel turpis nunc eget lorem dolor sed viverra. Posuere ac ut consequat
-		semper viverra nam. Laoreet suspendisse interdum consectetur libero id faucibus. Diam phasellus
-		vestibulum lorem sed risus ultricies tristique. Rhoncus dolor purus non enim praesent elementum
-		facilisis. Ultrices tincidunt arcu non sodales neque. Tempus egestas sed sed risus pretium quam
-		vulputate. Viverra suspendisse potenti nullam ac tortor vitae purus faucibus ornare. Fringilla
-		urna porttitor rhoncus dolor purus non. Amet dictum sit amet justo donec enim.
+		I like understanding things all the way down — how a CPU actually executes an instruction,
+		how an OS schedules a process, how a system breaks when you push on it the wrong way. That
+		curiosity is what this site is for: writing up what I dig into on the low-level and security
+		side, outside of day-to-day web development.
 	</p>
+	<div class="tags">
+		{interests.map((tag) => <Tag label={tag} />)}
+	</div>
 
+	<h2>elsewhere</h2>
 	<p>
-		Mattis ullamcorper velit sed ullamcorper morbi tincidunt. Tortor posuere ac ut consequat semper
-		viverra. Tellus mauris a diam maecenas sed enim ut sem viverra. Venenatis urna cursus eget nunc
-		scelerisque viverra mauris in. Arcu ac tortor dignissim convallis aenean et tortor at. Curabitur
-		gravida arcu ac tortor dignissim convallis aenean et tortor. Egestas tellus rutrum tellus
-		pellentesque eu. Fusce ut placerat orci nulla pellentesque dignissim enim sit amet. Ut enim
-		blandit volutpat maecenas volutpat blandit aliquam etiam. Id donec ultrices tincidunt arcu. Id
-		cursus metus aliquam eleifend mi.
-	</p>
-
-	<p>
-		Tempus quam pellentesque nec nam aliquam sem. Risus at ultrices mi tempus imperdiet. Id porta
-		nibh venenatis cras sed felis eget velit. Ipsum a arcu cursus vitae. Facilisis magna etiam
-		tempor orci eu lobortis elementum. Tincidunt dui ut ornare lectus sit. Quisque non tellus orci
-		ac. Blandit libero volutpat sed cras. Nec tincidunt praesent semper feugiat nibh sed pulvinar
-		proin gravida. Egestas integer eget aliquet nibh praesent tristique magna.
+		Outside of code: breakdance and fitness. Different kind of practice, same instinct — take
+		something apart, repeat it until it clicks, put it back together better.
 	</p>
 </Layout>
+
+<style>
+	.line {
+		margin: 0 0 0.2em 0;
+	}
+	.prompt {
+		color: var(--color-accent);
+		margin-right: 0.5em;
+	}
+	.output {
+		margin: 0;
+		color: var(--color-text);
+	}
+	h2 {
+		margin-top: 2em;
+		font-size: 1.1em;
+		color: var(--color-muted);
+		text-transform: lowercase;
+		letter-spacing: 0.02em;
+	}
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4em;
+		margin: -0.5em 0 1.5em 0;
+	}
+</style>
