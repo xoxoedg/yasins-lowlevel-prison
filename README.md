@@ -1,63 +1,54 @@
-# Astro Starter Kit: Blog
+# Yasins Lowlevel Prison
 
-```sh
-npm create astro@latest -- --template blog
-```
+Personal blog and portfolio, built with [Astro](https://astro.build) and Tailwind CSS. Terminal/hacker-inspired look, focused on low-level programming, OS internals, and security write-ups.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Stack
 
-Features:
+- [Astro](https://astro.build) — static site generation, content collections
+- [Tailwind CSS v4](https://tailwindcss.com) — styling, theme tokens for the color palette
+- JetBrains Mono — site-wide monospace typeface, self-hosted via Astro's Font API
 
-- ✅ Minimal styling (make it your own!)
-- ✅ 100/100 Lighthouse performance
-- ✅ SEO-friendly with canonical URLs and Open Graph data
-- ✅ Sitemap support
-- ✅ RSS Feed support
-- ✅ Markdown & MDX support
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
+## Project structure
 
 ```text
-├── public/
+├── public/               # static assets (favicon, cv.pdf, ...)
 ├── src/
-│   ├── assets/
-│   ├── components/
-│   ├── content/
-│   ├── layouts/
-│   └── pages/
+│   ├── assets/           # images, fonts
+│   ├── components/       # Header, Footer, TerminalWindow, PostCard, Tag, ...
+│   ├── content/blog/     # blog posts (Markdown/MDX)
+│   ├── layouts/          # BlogPost.astro
+│   └── pages/            # index, blog, projects, about
 ├── astro.config.mjs
-├── README.md
-├── package.json
-└── tsconfig.json
+└── src/styles/global.css # Tailwind import + color/theme tokens
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Writing a new post
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+Add a `.md` (or `.mdx`) file under `src/content/blog/`:
 
-The `src/content/` directory contains "collections" of related Markdown and MDX documents. Use `getCollection()` to retrieve posts from `src/content/blog/`, and type-check your frontmatter using an optional schema. See [Astro's Content Collections docs](https://docs.astro.build/en/guides/content-collections/) to learn more.
+```markdown
+---
+title: 'Post title'
+description: 'Short description for meta tags and RSS'
+pubDate: 'Aug 22 2026'
+tags: ['linux', 'hacking']
+---
 
-Any static assets, like images, can be placed in the `public/` directory.
+Post content here.
+```
 
-## 🧞 Commands
+See `src/content.config.ts` for the full frontmatter schema.
 
-All commands are run from the root of the project, from a terminal:
+## Commands
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+| Command                   | Action                                       |
+| :------------------------ | :-------------------------------------------- |
+| `npm install`              | Install dependencies                          |
+| `npm run dev`               | Start local dev server at `localhost:4321`   |
+| `npm run build`             | Build production site to `./dist/`           |
+| `npm run preview`           | Preview the build locally                    |
+| `npm run astro ...`         | Run Astro CLI commands (`astro add`, `astro check`) |
 
 ## Credit
 
-This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+Originally scaffolded from Astro's official blog starter theme, which is based on [Bear Blog](https://github.com/HermanMartinus/bearblog/).
