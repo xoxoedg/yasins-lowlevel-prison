@@ -1,0 +1,144 @@
+---
+// Fake Linux boot log shown once per browser on the first visit.
+// Click or any key skips it; reduced-motion users and no-JS visitors never see it.
+// Replay it with the shell command `reboot` or by adding `?boot` to the URL.
+---
+
+<div id="boot" class="boot" hidden aria-hidden="true">
+	<pre id="boot-log" class="boot-log"></pre>
+	<p class="boot-skip">press any key to skip</p>
+</div>
+
+<script is:inline>
+	(() => {
+		const KEY = 'booted';
+		let seen = false;
+		try {
+			seen = localStorage.getItem(KEY) === '1';
+			localStorage.setItem(KEY, '1');
+		} catch {}
+		const forced = new URLSearchParams(location.search).has('boot');
+		const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+		const boot = document.getElementById('boot');
+		const log = document.getElementById('boot-log');
+		const lines = [
+			'lowlevel BIOS v1.337 (c) 2026 yasin',
+			'CPU: caffeine-powered x86_64 @ 0xDEADBEEF MHz',
+			'Memory test: 655360K OK',
+			'Booting from /dev/sda1 ...',
+			'',
+			'[    0.000000] Linux version 6.9.0-lowlevel (yasin@prison) (gcc 14.2.0) #1 SMP PREEMPT',
+			'[    0.000000] Command line: BOOT_IMAGE=/vmlinuz root=/dev/blog ro quiet',
+			'[    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff] usable',
+			'[    0.004211] Memory: 760K/760K available (1337K kernel code, 42K rwdata)',
+			'[    0.008190] x86/fpu: Enabled xstate features 0x7, context size is 832 bytes',
+			'[    0.013370] smpboot: CPU0: Intel(R) Core(TM) i7 @ 3.40GHz (family: 0x6)',
+			'[    0.021004] ACPI: Core revision 20240827',
+			'[    0.034512] PCI: Using configuration type 1 for base access',
+			'[    0.051200] random: crng init done',
+			'[    0.073311] usb 1-1: new high-speed USB device number 2 using xhci_hcd',
+			'[    0.092048] EXT4-fs (sda1): mounted filesystem with ordered data mode',
+			'[    0.104400] Mounting /dev/blog on / ...',
+			'[    0.130021] ok   Started Journal Service',
+			'[    0.141337] ok   Loaded posts from /content/blog',
+			'[    0.152100] ok   Mounted /stack and /heap',
+			'[    0.163880] ok   Started terminal.service',
+			'[    0.170000] ok   Reached target Graphical Interface',
+			'',
+			'lowlevel-prison login: yasin',
+			'Password: ********',
+			'Welcome. Last login: never. Nobody ever escapes.',
+		];
+
+		let i = 0;
+		let timer;
+		const finish = () => {
+			clearTimeout(timer);
+			removeEventListener('keydown', finish);
+			boot.removeEventListener('click', finish);
+			boot.classList.add('boot-done');
+			document.body.style.overflow = '';
+			setTimeout(() => {
+				boot.hidden = true;
+				boot.classList.remove('boot-done');
+				log.replaceChildren();
+			}, 300);
+		};
+		const step = () => {
+			if (i >= lines.length) {
+				timer = setTimeout(finish, 700);
+				return;
+			}
+			const line = lines[i++];
+			const el = document.createElement('div');
+			if (line.includes(' ok ')) {
+				const [time, rest] = line.split(' ok ');
+				el.append(time + ' [');
+				const ok = document.createElement('span');
+				ok.className = 'boot-ok';
+				ok.textContent = '  OK  ';
+				el.append(ok, ']' + rest);
+			} else {
+				el.textContent = line || ' ';
+			}
+			log.append(el);
+			timer = setTimeout(step, line === '' || line.startsWith('Password') || line.startsWith('Booting') ? 400 : 80 + Math.random() * 110);
+		};
+
+		const start = () => {
+			clearTimeout(timer);
+			i = 0;
+			log.replaceChildren();
+			document.body.style.overflow = 'hidden';
+			boot.hidden = false;
+			// Attach skip handlers on the next tick so the key that started a reboot doesn't skip it.
+			setTimeout(() => {
+				addEventListener('keydown', finish);
+				boot.addEventListener('click', finish);
+			});
+			step();
+		};
+
+		window.bootSequence = start;
+		if (forced || (!seen && !reducedMotion)) start();
+	})();
+</script>
+
+<style>
+	.boot {
+		position: fixed;
+		inset: 0;
+		z-index: 1000;
+		background: var(--color-bg);
+		padding: 1.5em;
+		overflow: hidden;
+		cursor: pointer;
+		transition: opacity 0.3s ease;
+	}
+	.boot[hidden] {
+		display: none;
+	}
+	.boot.boot-done {
+		opacity: 0;
+	}
+	.boot-log {
+		margin: 0;
+		color: var(--color-text);
+		font-size: 0.85em;
+		line-height: 1.5;
+		white-space: pre-wrap;
+		word-break: break-all;
+	}
+	.boot-log :global(.boot-ok) {
+		color: var(--color-accent);
+	}
+	.boot-skip {
+		position: absolute;
+		right: 1.5em;
+		bottom: 1em;
+		margin: 0;
+		color: var(--color-muted);
+		font-size: 0.8em;
+	}
+</style>

@@ -1,0 +1,276 @@
+---
+// Fake interactive shell for the home page. Runs entirely in the browser:
+// commands are a fixed set with prepared answers, nothing is executed anywhere.
+interface Post {
+	id: string;
+	title: string;
+	description: string;
+	date: string;
+}
+
+interface Props {
+	posts: Post[];
+}
+
+const { posts } = Astro.props;
+---
+
+<div class="shell" data-posts={JSON.stringify(posts)}>
+	<div class="shell-output" aria-live="polite"></div>
+	<form class="shell-line">
+		<label class="shell-prompt" for="shell-input">$</label>
+		<input
+			id="shell-input"
+			class="shell-input"
+			type="text"
+			autocomplete="off"
+			autocapitalize="off"
+			spellcheck="false"
+			placeholder="type 'help'"
+			aria-label="Terminal command"
+		/>
+	</form>
+</div>
+
+<script>
+	interface Post {
+		id: string;
+		title: string;
+		description: string;
+		date: string;
+	}
+
+	const root = document.querySelector<HTMLElement>('.shell');
+	if (root) init(root);
+
+	function init(root: HTMLElement) {
+		const posts: Post[] = JSON.parse(root.dataset.posts ?? '[]');
+		const output = root.querySelector<HTMLElement>('.shell-output')!;
+		const form = root.querySelector<HTMLFormElement>('.shell-line')!;
+		const input = root.querySelector<HTMLInputElement>('.shell-input')!;
+
+		const dirs: Record<string, string> = {
+			blog: '/blog',
+			projects: '/projects',
+			about: '/about',
+		};
+		const history: string[] = [];
+		let historyIndex = 0;
+
+		const print = (text: string, cls = '') => {
+			const el = document.createElement('div');
+			el.className = `shell-out ${cls}`;
+			el.textContent = text || ' ';
+			output.append(el);
+		};
+		const echoCommand = (cmd: string) => {
+			const el = document.createElement('div');
+			el.className = 'shell-out';
+			const prompt = document.createElement('span');
+			prompt.className = 'shell-prompt';
+			prompt.textContent = '$';
+			el.append(prompt, cmd);
+			output.append(el);
+		};
+		const go = (href: string) => {
+			print(`navigating to ${href} ...`, 'muted');
+			setTimeout(() => (location.href = href), 350);
+		};
+		const findPost = (id: string) => posts.find((p) => p.id === id.replace(/\/$/, '').replace(/^blog\//, ''));
+
+		const commands: Record<string, (args: string[]) => void> = {
+			help: () => {
+				[
+					'available commands:',
+					'  whoami          who runs this place',
+					'  ls [blog]       list directories or posts',
+					'  cat <post>      show what a post is about',
+					'  open <post|cv>  open a post or the cv',
+					'  cd <dir>        go to blog, projects or about',
+					'  reboot          watch the machine boot again',
+					'  pwd, date, uname, echo, history, clear',
+				].forEach((l) => print(l));
+			},
+			whoami: () => print('yasin, systems tinkerer'),
+			pwd: () => print('/home/yasin'),
+			date: () => print(new Date().toString()),
+			uname: (args) =>
+				print(args.includes('-a') ? 'Linux lowlevel-prison 6.9.0-lowlevel #1 SMP PREEMPT x86_64 GNU/Linux' : 'Linux'),
+			echo: (args) => print(args.join(' ')),
+			history: () => history.forEach((h, i) => print(`${String(i + 1).padStart(4)}  ${h}`)),
+			clear: () => output.replaceChildren(),
+			ls: (args) => {
+				const target = (args.find((a) => !a.startsWith('-')) ?? '').replace(/\/$/, '');
+				if (!target || target === '.' || target === '~') {
+					print('blog/  projects/  about/  cv.pdf');
+				} else if (target === 'blog') {
+					if (posts.length === 0) print('(empty)', 'muted');
+					posts.forEach((p) => print(`${p.date}  ${p.id}`));
+				} else if (target in dirs) {
+					print(`(use 'cd ${target}' to look inside)`, 'muted');
+				} else {
+					print(`ls: cannot access '${target}': No such file or directory`, 'error');
+				}
+			},
+			cat: (args) => {
+				const target = args[0];
+				if (!target) return print('cat: missing operand', 'error');
+				if (target === 'cv.pdf') return print('cat: cv.pdf: binary file, try: open cv', 'error');
+				const post = findPost(target);
+				if (!post) return print(`cat: ${target}: No such file or directory`, 'error');
+				print(post.title, 'accent');
+				print(post.description);
+				print(`open it with: open ${post.id}`, 'muted');
+			},
+			open: (args) => {
+				const target = args[0];
+				if (!target) return print('open: missing operand', 'error');
+				if (target === 'cv' || target === 'cv.pdf') return go('/cv.pdf');
+				const post = findPost(target);
+				if (!post) return print(`open: ${target}: No such file or directory`, 'error');
+				go(`/blog/${post.id}/`);
+			},
+			cd: (args) => {
+				const target = (args[0] ?? '~').replace(/\/$/, '').replace(/^\//, '');
+				if (target === '~' || target === '' || target === '.') return;
+				if (target === '..') return print('cd: permission denied: you are in prison', 'error');
+				if (target in dirs) return go(dirs[target]);
+				const post = findPost(target);
+				if (post) return go(`/blog/${post.id}/`);
+				print(`cd: no such file or directory: ${target}`, 'error');
+			},
+			sudo: () => print('yasin is not in the sudoers file. This incident will be reported.', 'error'),
+			exit: () => print('There is no escape from the prison.', 'muted'),
+			rm: (args) => {
+				if (!(args.some((a) => a.startsWith('-') && a.includes('r')) && args.includes('/'))) {
+					return print('rm: refusing to delete anything here', 'error');
+				}
+				[
+					'Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b',
+					'CPU: 0 PID: 1 Comm: init Not tainted 6.9.0-lowlevel #1',
+					'Call Trace:',
+					' <TASK>',
+					' dump_stack_lvl+0x48/0x70',
+					' panic+0x33c/0x370',
+					' do_exit.cold+0x15/0x15',
+					' </TASK>',
+					'---[ end Kernel panic - not syncing ]---',
+				].forEach((l) => print(l, 'error'));
+				setTimeout(() => print('...just kidding. nice try though.', 'muted'), 1200);
+			},
+		};
+		commands.reboot = () => {
+			const boot = (window as Window & { bootSequence?: () => void }).bootSequence;
+			if (boot) boot();
+			else print('reboot: must be superuser', 'error');
+		};
+		commands.ll = () => commands.ls(['-l']);
+		commands.vim = () => print("you can check out any time you like, but you can never :q", 'muted');
+
+		const run = (raw: string) => {
+			const line = raw.trim();
+			echoCommand(raw);
+			if (!line) return;
+			history.push(line);
+			historyIndex = history.length;
+			const [cmd, ...args] = line.split(/\s+/);
+			const handler = commands[cmd];
+			if (handler) handler(args);
+			else print(`zsh: command not found: ${cmd}`, 'error');
+		};
+
+		const complete = (value: string) => {
+			const parts = value.split(/\s+/);
+			const last = parts[parts.length - 1];
+			const candidates =
+				parts.length === 1
+					? Object.keys(commands)
+					: [...Object.keys(dirs), ...posts.map((p) => p.id), 'cv.pdf'];
+			const matches = candidates.filter((c) => c.startsWith(last));
+			if (matches.length === 1) {
+				parts[parts.length - 1] = matches[0];
+				return parts.join(' ') + ' ';
+			}
+			if (matches.length > 1) {
+				echoCommand(value);
+				print(matches.join('  '));
+			}
+			return value;
+		};
+
+		form.addEventListener('submit', (e) => {
+			e.preventDefault();
+			run(input.value);
+			input.value = '';
+			input.scrollIntoView({ block: 'nearest' });
+		});
+
+		input.addEventListener('keydown', (e) => {
+			if (e.key === 'Tab') {
+				e.preventDefault();
+				input.value = complete(input.value);
+			} else if (e.key === 'ArrowUp') {
+				e.preventDefault();
+				if (historyIndex > 0) input.value = history[--historyIndex];
+			} else if (e.key === 'ArrowDown') {
+				e.preventDefault();
+				historyIndex = Math.min(historyIndex + 1, history.length);
+				input.value = history[historyIndex] ?? '';
+			} else if (e.ctrlKey && e.key === 'l') {
+				e.preventDefault();
+				commands.clear([]);
+			} else if (e.ctrlKey && e.key === 'c' && input.selectionStart === input.selectionEnd) {
+				e.preventDefault();
+				echoCommand(input.value + '^C');
+				input.value = '';
+			}
+		});
+
+		// Clicking anywhere in the terminal focuses the prompt, unless text is being selected.
+		root.closest('.terminal-window')?.addEventListener('click', () => {
+			if (!getSelection()?.toString()) input.focus();
+		});
+	}
+</script>
+
+<style>
+	.shell :global(.shell-out) {
+		white-space: pre-wrap;
+		word-break: break-word;
+		color: var(--color-text);
+	}
+	.shell :global(.shell-out.muted) {
+		color: var(--color-muted);
+	}
+	.shell :global(.shell-out.error) {
+		color: #ff7b72;
+	}
+	.shell :global(.shell-out.accent) {
+		color: var(--color-accent);
+		font-weight: 700;
+	}
+	.shell :global(.shell-prompt) {
+		color: var(--color-accent);
+		margin-right: 0.5em;
+	}
+	.shell-line {
+		display: flex;
+		align-items: baseline;
+		margin: 0;
+	}
+	.shell-input {
+		flex: 1;
+		min-width: 0;
+		padding: 0;
+		border: none;
+		outline: none;
+		background: transparent;
+		color: var(--color-text);
+		font: inherit;
+		caret-color: var(--color-accent);
+	}
+	.shell-input::placeholder {
+		color: var(--color-muted);
+		opacity: 0.6;
+	}
+</style>
