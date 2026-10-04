@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+	<rect width="720" height="400" fill="#0d1117" />
+
+	<!-- address axis -->
+	<text x="20" y="34" fill="#e6edf3" font-weight="700">High address</text>
+	<line x1="125" y1="30" x2="210" y2="30" stroke="#8b949e" />
+	<text x="20" y="374" fill="#e6edf3" font-weight="700">Low address</text>
+	<line x1="125" y1="370" x2="210" y2="370" stroke="#8b949e" />
+
+	<!-- runtime regions -->
+	<rect x="220" y="30" width="240" height="45" fill="#1b2d45" stroke="#30363d" />
+	<text x="340" y="57" fill="#e6edf3" font-weight="700" text-anchor="middle">Stack</text>
+	<rect x="220" y="75" width="240" height="90" fill="#0d1117" stroke="#30363d" />
+	<line x1="340" y1="85" x2="340" y2="106" stroke="#8b949e" />
+	<line x1="340" y1="155" x2="340" y2="134" stroke="#8b949e" />
+	<rect x="220" y="165" width="240" height="45" fill="#1b2d45" stroke="#30363d" />
+	<text x="340" y="192" fill="#e6edf3" font-weight="700" text-anchor="middle">Heap</text>
+
+	<!-- binary regions -->
+	<rect x="220" y="210" width="240" height="40" fill="#3a2320" stroke="#30363d" />
+	<text x="340" y="235" fill="#e6edf3" font-weight="700" text-anchor="middle">.bss</text>
+	<rect x="220" y="250" width="240" height="40" fill="#3a2320" stroke="#30363d" />
+	<text x="340" y="275" fill="#e6edf3" font-weight="700" text-anchor="middle">.data</text>
+	<rect x="220" y="290" width="240" height="40" fill="#3a2320" stroke="#30363d" />
+	<text x="340" y="315" fill="#e6edf3" font-weight="700" text-anchor="middle">.rodata</text>
+	<rect x="220" y="330" width="240" height="40" fill="#3a2320" stroke="#30363d" />
+	<text x="340" y="355" fill="#e6edf3" font-weight="700" text-anchor="middle">.text</text>
+
+	<!-- group labels -->
+	<text x="205" y="115" fill="#8b949e" text-anchor="end">size changes</text>
+	<text x="205" y="132" fill="#8b949e" text-anchor="end">at runtime</text>
+	<text x="205" y="294" fill="#8b949e" text-anchor="end">fixed size</text>
+
+	<!-- descriptions -->
+	<g fill="#8b949e">
+		<text x="480" y="57">local variables, function calls</text>
+		<text x="480" y="124">free space, both grow into it</text>
+		<text x="480" y="192">memory requested at runtime</text>
+		<text x="480" y="235">globals without a start value</text>
+		<text x="480" y="275">globals with a start value</text>
+		<text x="480" y="315">constants, string literals</text>
+		<text x="480" y="355">machine code</text>
+	</g>
+	<!-- arrowheads -->
+	<g fill="#8b949e">
+		<path d="M218,30 l-9,-4 v8 z" />
+		<path d="M218,370 l-9,-4 v8 z" />
+		<path d="M340,114 l-4,-9 h8 z" />
+		<path d="M340,126 l-4,9 h8 z" />
+	</g>
+</svg>
