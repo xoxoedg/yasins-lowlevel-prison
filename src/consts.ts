@@ -11,4 +11,4 @@ export const NAV_LINKS = [
 	{ href: '/cv.pdf', label: 'cv.pdf' },
 ] as const;
 
-export const SOCIAL_LINKS = [{ href: 'https://github.com/', label: 'github' }] as const;
+export const SOCIAL_LINKS = [{ href: 'https://github.com/xoxoedg', label: 'github' }] as const;
