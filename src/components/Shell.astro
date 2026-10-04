@@ -19,16 +19,22 @@ const { posts } = Astro.props;
 	<div class="shell-output" aria-live="polite"></div>
 	<form class="shell-line">
 		<label class="shell-prompt" for="shell-input">$</label>
-		<input
-			id="shell-input"
-			class="shell-input"
-			type="text"
-			autocomplete="off"
-			autocapitalize="off"
-			spellcheck="false"
-			placeholder="type 'help'"
-			aria-label="Terminal command"
-		/>
+		<div class="shell-field">
+			<!-- Visible copy of the input with a block cursor; the real input sits invisibly on top. -->
+			<span class="shell-mirror" aria-hidden="true"
+				><span class="shell-before"></span><span class="shell-cursor">&nbsp;</span><span
+					class="shell-after"></span><span class="shell-hint">type 'help'</span></span
+			>
+			<input
+				id="shell-input"
+				class="shell-input"
+				type="text"
+				autocomplete="off"
+				autocapitalize="off"
+				spellcheck="false"
+				aria-label="Terminal command"
+			/>
+		</div>
 	</form>
 </div>
 
@@ -48,6 +54,24 @@ const { posts } = Astro.props;
 		const output = root.querySelector<HTMLElement>('.shell-output')!;
 		const form = root.querySelector<HTMLFormElement>('.shell-line')!;
 		const input = root.querySelector<HTMLInputElement>('.shell-input')!;
+		const before = root.querySelector<HTMLElement>('.shell-before')!;
+		const cursor = root.querySelector<HTMLElement>('.shell-cursor')!;
+		const after = root.querySelector<HTMLElement>('.shell-after')!;
+		const hint = root.querySelector<HTMLElement>('.shell-hint')!;
+
+		// Draw the mirrored text with the block cursor sitting on the character at the caret.
+		const render = () => {
+			const value = input.value;
+			const pos = input.selectionStart ?? value.length;
+			before.textContent = value.slice(0, pos);
+			cursor.textContent = value[pos] ?? '\u00a0';
+			after.textContent = value.slice(pos + 1);
+			hint.hidden = value.length > 0;
+			// Restart the blink so the cursor is solid right after each keystroke.
+			cursor.classList.remove('blink');
+			void cursor.offsetWidth;
+			cursor.classList.add('blink');
+		};
 
 		const dirs: Record<string, string> = {
 			blog: '/blog',
@@ -202,8 +226,12 @@ const { posts } = Astro.props;
 			e.preventDefault();
 			run(input.value);
 			input.value = '';
+			render();
 			input.scrollIntoView({ block: 'nearest' });
 		});
+
+		input.addEventListener('input', render);
+		document.addEventListener('selectionchange', render);
 
 		input.addEventListener('keydown', (e) => {
 			if (e.key === 'Tab') {
@@ -224,7 +252,10 @@ const { posts } = Astro.props;
 				echoCommand(input.value + '^C');
 				input.value = '';
 			}
+			requestAnimationFrame(render);
 		});
+
+		render();
 
 		// Clicking anywhere in the terminal focuses the prompt, unless text is being selected.
 		root.closest('.terminal-window')?.addEventListener('click', () => {
@@ -258,19 +289,56 @@ const { posts } = Astro.props;
 		align-items: baseline;
 		margin: 0;
 	}
-	.shell-input {
+	.shell-field {
+		position: relative;
 		flex: 1;
 		min-width: 0;
+	}
+	.shell-mirror {
+		white-space: pre-wrap;
+		word-break: break-all;
+		color: var(--color-text);
+	}
+	.shell-cursor {
+		background: var(--color-accent);
+		color: var(--color-bg);
+	}
+	.shell-cursor.blink {
+		animation: blink 1s steps(1) infinite;
+	}
+	.shell-hint {
+		margin-left: 0.5em;
+		color: var(--color-muted);
+		opacity: 0.6;
+	}
+	.shell-hint[hidden] {
+		display: none;
+	}
+	.shell-input {
+		position: absolute;
+		inset: 0;
+		width: 100%;
 		padding: 0;
 		border: none;
 		outline: none;
 		background: transparent;
-		color: var(--color-text);
+		color: transparent;
+		caret-color: transparent;
 		font: inherit;
-		caret-color: var(--color-accent);
+		cursor: text;
 	}
-	.shell-input::placeholder {
-		color: var(--color-muted);
-		opacity: 0.6;
+	.shell-input::selection {
+		background: transparent;
+	}
+	@keyframes blink {
+		50% {
+			background: transparent;
+			color: var(--color-text);
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.shell-cursor.blink {
+			animation: none;
+		}
 	}
 </style>
