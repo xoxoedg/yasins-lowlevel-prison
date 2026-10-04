@@ -1,0 +1,9 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "yasins-lowlevel-prison",
+	"compatibility_date": "2026-10-04",
+	// Static site: upload the Astro build output, no Worker code needed.
+	"assets": {
+		"directory": "./dist"
+	}
+}
